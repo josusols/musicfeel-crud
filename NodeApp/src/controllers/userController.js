@@ -11,6 +11,10 @@ controller.save = (req, res) => {
     console.log(data);
     req.getConnection((err, conn) => {
         conn.query('INSERT INTO user set ?',[data], (err, rows) => {
+            if (err)
+            {
+                return res.status(400).send('Error al registrar al usuario');
+            }
             console.log(rows);
             return res.status(200).send({
                 rows
@@ -26,16 +30,14 @@ controller.login = (req, res) => {
         conn.query('Select id, username, password FROM user where username = ?', [req.body.username],(err, usuarios) => {
             if(err)
             {
-                res.json(err);
+                return res.status(400).send(err);
             }
             console.log(usuarios);
             let ok = "ok";
             if(usuarios[0].username == req.body.username && usuarios[0].password == req.body.password)
             {
-                res.status(200).send(usuarios[0].id);
                 console.log(usuarios[0].id);
                 let user_id = usuarios[0].id;
-                console.log("entro a la condicion de cristian");
                 return res.status(200).send({ user_id });
             }
             else
@@ -71,7 +73,7 @@ controller.getRecommendations = (req, res) => {
         conn.query('Select * FROM recommendations where userid = ?', [id],(err, recomendaciones) => {
             if(err)
             {
-                res.json(err);
+                return res.status(400).send(err);
             }
 
             console.log('mensaje x');
